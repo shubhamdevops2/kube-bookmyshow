@@ -86,20 +86,25 @@ spec:
   selector:
     matchLabels:
       app: handler-deploy
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-            - key: name
-              operator: In
-              values:
-                - worker1
   template:
     metadata:
       labels:
         app: handler-deploy
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: name
+                  operator: In
+                  values:
+                    - worker1
+      tolerations:
+        - key: "app"
+          operator: "Equal"
+          value: "blue"
+          effect: "NoSchedule"
       containers:
         - name: handler
           image: shubhamdevops2/handler
