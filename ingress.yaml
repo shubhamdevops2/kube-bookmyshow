@@ -1,0 +1,47 @@
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: urlshorten-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  labels:
+    name: urlshorten-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: urlshorten.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: handler-svc
+            port:
+              number: 3001
+        path: /shorten
+        pathType: Prefix
+      - backend:
+          service:
+            name: handler-svc
+            port:
+              number: 3001
+        path: /:shortURL
+        pathType: Prefix
+      - backend:
+          service:
+            name: handler-svc
+            port:
+              number: 3001
+        path: /reverse/:shortURL
+        pathType: Prefix
+      - backend:
+          service:
+            name: urlshorten-svc
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+
+
+
+

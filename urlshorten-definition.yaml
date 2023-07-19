@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: urlshorten-pv
+  labels:
+    pv: urlshorten-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/worker2/bookmyshow/urlshorten
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: urlshorten-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  selector:
+    matchLabels:
+      pv: urlshorten-pv
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: urlshorten-deploy
+spec:
+  selector:
+    matchLabels:
+      app: urlshorten-deploy
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: name
+              operator: In
+              values:
+                - worker2
+  template:
+    metadata:
+      labels:
+        app: urlshorten-deploy
+    spec:
+      containers:
+        - name: web
+          image: shubhamdevops2/urlshorten
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: urlshorten-volume
+              mountPath: ~/app
+      volumes:
+        - name: urlshorten-volume
+          persistantVolumeClaim:
+            claimName: urlshorten-pvc
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: urlshorten-svc
+spec:
+  selector:
+    app: urlshorten-deploy
+  ports:
+  - name: web
+    port: 3000
+    targetPort: 3000
+

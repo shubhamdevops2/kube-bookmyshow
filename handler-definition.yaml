@@ -1,0 +1,193 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: handler-pv
+  labels:
+    pv: handler-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/worker1/bookmyshow/handler
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mondodb-pv
+  labels:
+    pv: mondodb-pv
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/worker1/bookmyshow/mondodb
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: handler-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  selector:
+    matchLabels:
+      pv: handler-pv
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+spec:
+  resources:
+    requests:
+      storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  selector:
+    matchLabels:
+      pv: mongodb-pv
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: VRuAd2Nvmp4ELHh5
+  database: dGVzdA==
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: handler-deploy
+spec:
+  selector:
+    matchLabels:
+      app: handler-deploy
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: name
+              operator: In
+              values:
+                - worker1
+  template:
+    metadata:
+      labels:
+        app: handler-deploy
+    spec:
+      containers:
+        - name: handler
+          image: shubhamdevops2/handler
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 3001
+          volumeMounts:
+            - name: handler-volume
+              mountPath: ~/app
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: password
+            - name: MONGO_INITDB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: database
+        - name: mongodb-bks
+          image: mongo
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "350Mi"
+              cpu: "300m"
+            requests:
+              memory: "250Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-volume
+              mountPath: /data/db
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: password
+            - name: MONGO_INITDB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: database
+      volumes:
+        - name: handler-volume
+          persistantVolumeClaim:
+            claimName: handler-pvc
+        - name: mongodb-volume
+          persistantVolumeClaim:
+            claimName: mongodb-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: handler-svc
+spec:
+  selector:
+    app: handler-deploy
+  ports:
+  - name: handler
+    port: 3001
+    targetPort: 3001
+  - name: mongodb-bks
+    port: 27017
+    targetPort: 27017
+
+
+
+
