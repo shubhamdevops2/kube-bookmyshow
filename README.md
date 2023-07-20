@@ -23,15 +23,19 @@ This application serves as a frontend that communicates exclusively with the han
 
 This server functions as a middleware between the front-end and backend applications, facilitating the communication and passing API requests between the two. It acts as an intermediary, enabling seamless interaction and data exchange between the front-end and backend components of the application.
 
-### MongoDB - The image used to run this backend server is obtained from the public Docker Hub, simplifying the deployment process
+### MongoDB - 
+
+The image used to run this backend server is obtained from the **public Docker Hub**, simplifying the deployment process
 
 This backend server serves as the data storage and retrieval component for the frontend application. It is responsible for handling API requests and interacting with the public Docker Hub to fetch images as needed. The data from the frontend is stored in the backend database, and the backend server facilitates the retrieval of this data when requested by the frontend.
 
 ##
 
+### Ingress
+
 Our microservices deployment benefits from load balancing using NGINX Ingress as the Kubernetes Ingress load balancer. It efficiently distributes incoming traffic among the microservices, provides routing and path-based traffic management, handles seamlessly connecting clients to the appropriate backend microservices.
 
-### Please read the below files for the microservices kuberenetes architecture
+# Please read the below files for the microservices kuberenetes architecture
 
 1) URLshorten - urlshorten-definition.yaml
 1) Handler - handler-definition.yaml
