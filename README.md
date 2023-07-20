@@ -4,8 +4,12 @@ This project is created to understand the architecture of shorten URL applicatio
 
 Example -
 
-### Input URL -> https://en.wikipedia.org/wiki/Artificial_intelligence
-### Output URL -> http://localhost:3000/70ovli4d
+**Input URL ->** https://en.wikipedia.org/wiki/Artificial_intelligence
+**Output URL ->** http://localhost:3000/70ovli4d
+
+
+##
+
 
 To accomplish this we have created three microservices as below:
 
@@ -23,7 +27,7 @@ This application serves as a frontend that communicates exclusively with the han
 
 This server functions as a middleware between the front-end and backend applications, facilitating the communication and passing API requests between the two. It acts as an intermediary, enabling seamless interaction and data exchange between the front-end and backend components of the application.
 
-### MongoDB - 
+### MongoDB 
 
 The image used to run this backend server is obtained from the **public Docker Hub**, simplifying the deployment process
 
@@ -35,7 +39,7 @@ This backend server serves as the data storage and retrieval component for the f
 
 Our microservices deployment benefits from load balancing using NGINX Ingress as the Kubernetes Ingress load balancer. It efficiently distributes incoming traffic among the microservices, provides routing and path-based traffic management, handles seamlessly connecting clients to the appropriate backend microservices.
 
-# Please read the below files for the microservices kuberenetes architecture
+## Please read the below files for the microservices kuberenetes architecture
 
 1) URLshorten - urlshorten-definition.yaml
 1) Handler - handler-definition.yaml
