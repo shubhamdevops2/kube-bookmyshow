@@ -1,3 +1,4 @@
+# creating the PV for local file system
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -15,6 +16,7 @@ spec:
 
 ---
 
+# creating the PVC to access the above PV
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -32,6 +34,9 @@ spec:
 
 ---
 
+# Creating a deployment for the backend with affinity and tolerations to ensure it deploys specifically on the worker1 node.
+# The backend uses a Docker image fetched from public Docker Hub repository
+# In addition, we mount the container's volume to the specified PersistentVolumeClaim (PVC)
 apiVersion: apps/v1
 kind: Deployment
 metadata:

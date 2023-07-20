@@ -1,3 +1,4 @@
+# creating the PV for local file system
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -15,6 +16,7 @@ spec:
 
 ---
 
+# creating the PVC to access the above PV
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -32,6 +34,9 @@ spec:
 
 ---
 
+# Creating a deployment for the front-end application with affinity and tolerations to ensure it deploys specifically on the worker2 node.
+# The front-end application uses a Docker image fetched from my public Docker Hub repository
+# In addition, we mount the container's volume to the specified PersistentVolumeClaim (PVC)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -83,6 +88,7 @@ spec:
 
 ---
 
+# Create the service to connect with deployment
 apiVersion: v1
 kind: Service
 metadata:
@@ -98,6 +104,8 @@ spec:
 
 ---
 
+# Create the HPA for autoscaling of the pods base on the CPU utilization. 
+# Automatic pod scaling is configured based on CPU utilization, with scaling triggered when the container's CPU utilization exceeds 70%.
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
@@ -111,3 +119,5 @@ spec:
     kind: Deployment
     name: urlshorten-deploy
   targetCPUUtilizationPercentage: 70
+
+# Due to the limited resource we have only taken min and max repicas from 1 to 2
