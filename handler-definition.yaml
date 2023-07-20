@@ -42,7 +42,6 @@ type: Opaque
 data:
   username: YWRtaW4=
   password: YWRtaW4=
-  database: dGVzdA==
 
 ---
 
@@ -88,7 +87,7 @@ spec:
             - containerPort: 3001
           volumeMounts:
             - name: handler-volume
-              mountPath: ~/app
+              mountPath: /app
           env:
             - name: DB_USER
               valueFrom:
@@ -118,7 +117,24 @@ spec:
   - name: handler
     port: 3001
     targetPort: 3001
-  type: LoadBalancer
+
+---
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "handler-hpa"
+  namespace: default
+spec:
+  maxReplicas: 2
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: handler-deploy
+  targetCPUUtilizationPercentage: 70
 
 
 

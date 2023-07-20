@@ -74,7 +74,7 @@ spec:
             - containerPort: 3000
           volumeMounts:
             - name: urlshorten-volume
-              mountPath: ~/app
+              mountPath: /app
       volumes:
         - name: urlshorten-volume
           persistentVolumeClaim:
@@ -95,3 +95,19 @@ spec:
     port: 3000
     targetPort: 3000
 
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "urlshorten-hpa"
+  namespace: default
+spec:
+  maxReplicas: 2
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: urlshorten-deploy
+  targetCPUUtilizationPercentage: 70
