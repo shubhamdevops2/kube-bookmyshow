@@ -1,46 +1,43 @@
 
-  apiVersion: networking.k8s.io/v1
-  kind: Ingress
-  metadata:
+# Create the ingress load balancer to balance the traffic based on the path
+# path1 = /shorten - handler-svc:3001 - POST request to handler server - handler-svc:3001/shorten
+# path2 = /reverse/?(.*) - handler-svc:3001 - GET request to handler server with parameter val/ue passing - handler-svc:3001/reverse/bhadsbsd
+# path3 = / - urlshorten-svc:3000 - GET request to handler server  - urlshorten-svc:3000/
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: urlshorten-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  labels:
     name: urlshorten-ingress
-    annotations:
-      nginx.ingress.kubernetes.io/use-regex: "true"
-    labels:
-      name: urlshorten-ingress
-  spec:
-    ingressClassName: nginx
-    rules:
-    - host: urlshorten.com
-      http:
-        paths:
-        - backend:
-            service:
-              name: handler-svc
-              port:
-                number: 3001
-          path: /shorten
-          pathType: Prefix
-        - backend:
-            service:
-              name: handler-svc
-              port:
-                number: 3001
-          path: /shorten/?(.*)
-          pathType: Prefix
-        - backend:
-            service:
-              name: handler-svc
-              port:
-                number: 3001
-          path: /reverse/?(.*)
-          pathType: Prefix
-        - backend:
-            service:
-              name: urlshorten-svc
-              port:
-                number: 3000
-          path: /
-          pathType: Prefix
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: urlshorten.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: handler-svc
+            port:
+              number: 3001
+        path: /shorten
+        pathType: Prefix
+      - backend:
+          service:
+            name: handler-svc
+            port:
+              number: 3001
+        path: /reverse/?(.*)
+        pathType: Prefix
+      - backend:
+          service:
+            name: urlshorten-svc
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
 
 
 
