@@ -1,49 +1,49 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: urlshorten-pv
+  name: mongodb-pv
   labels:
-    pv: urlshorten-pv
+    pv: mongodb-pv
 spec:
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/worker2/bookmyshow/urlshorten
+    path: /home/worker1/bookmyshow/mondodb
 
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: urlshorten-pvc
+  name: mongodb-pvc
 spec:
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   selector:
     matchLabels:
-      pv: urlshorten-pv
+      pv: mongodb-pv
 
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: urlshorten-deploy
+  name: mongodb-deploy
 spec:
   selector:
     matchLabels:
-      app: urlshorten-deploy
+      app: mongodb-deploy
   template:
     metadata:
       labels:
-        app: urlshorten-deploy
+        app: mongodb-deploy
     spec:
       affinity:
         nodeAffinity:
@@ -53,32 +53,35 @@ spec:
                 - key: name
                   operator: In
                   values:
-                    - worker2
+                    - worker1
       tolerations:
         - key: "app"
           operator: "Equal"
-          value: "red"
+          value: "blue"
           effect: "NoSchedule"
       containers:
-        - name: web
-          image: shubhamdevops2/urlshorten:15
-          imagePullPolicy: Always
-          resources:
-            limits:
-              memory: "450Mi"
-              cpu: "400m"
-            requests:
-              memory: "350Mi"
-              cpu: "300m"
+        - name: mongo
+          image: mongo
           ports:
-            - containerPort: 3000
+            - containerPort: 27017
           volumeMounts:
-            - name: urlshorten-volume
-              mountPath: ~/app
+            - name: mongodb-volume
+              mountPath: /data/*
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: password
       volumes:
-        - name: urlshorten-volume
+        - name: mongodb-volume
           persistentVolumeClaim:
-            claimName: urlshorten-pvc
+            claimName: mongodb-pvc
 
 
 ---
@@ -86,12 +89,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: urlshorten-svc
+  name: mongodb-svc
 spec:
   selector:
-    app: urlshorten-deploy
+    app: mongodb-deploy
   ports:
-  - name: web
-    port: 3000
-    targetPort: 3000
-
+  - name: mongo
+    port: 27017
+    targetPort: 27017
