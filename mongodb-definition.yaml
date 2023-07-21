@@ -42,6 +42,7 @@ kind: Deployment
 metadata:
   name: mongodb-deploy
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mongodb-deploy

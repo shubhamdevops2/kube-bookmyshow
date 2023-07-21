@@ -57,6 +57,7 @@ kind: Deployment
 metadata:
   name: handler-deploy
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: handler-deploy

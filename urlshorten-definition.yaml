@@ -42,6 +42,7 @@ kind: Deployment
 metadata:
   name: urlshorten-deploy
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: urlshorten-deploy
