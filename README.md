@@ -4,17 +4,18 @@ This project is created to understand the architecture of shorten URL applicatio
 
 Example -
 
-**Input URL ->** https://en.wikipedia.org/wiki/Artificial_intelligence
+**Input URL ->** https://en.wikipedia.org/wiki/Artificial_intelligence , 
 **Output URL ->** http://localhost:3000/70ovli4d
 
 
 ##
 
+![architecture image.png](https://github.com/shubhamdevops2/kube-bookmyshow/blob/main/architecture%20image.png)
 
 To accomplish this we have created three microservices as below:
 
-1) URLshorten - [frontend](https://github.com/shubhamdevops2/bookmyshow_urlshorten)
-2) handler - [handler for application and database](https://github.com/shubhamdevops2/bookmyshow_handler)
+1) URLshorten repository- [frontend](https://github.com/shubhamdevops2/bookmyshow_urlshorten)
+2) handler repository- [handler for application and database](https://github.com/shubhamdevops2/bookmyshow_handler)
 3) mongodb - Backend mongodb database
 
 ##
